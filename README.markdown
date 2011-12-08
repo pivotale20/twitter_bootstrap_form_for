@@ -73,6 +73,14 @@ That's it. All of the Rails field helpers you know and love work just like
 their normal FormBuilder counterparts, but with minor extensions to expose
 the functionality anticipated by Twitter Bootstrap.
 
+## Errors ##
+
+The form builder helpers (`form_for` and `fields_for`) accept an `:error_html` option to control error rendering.
+
+    twitter_bootstrap_form_for @object, :error_html => :inline # Renders errors as spans (default)
+    twitter_bootstrap_form_for @object, :error_html => :block # Renders errors as p tags after the input
+    twitter_bootstrap_form_for @object, :error_html => {:tag => "section", :class => "my_error"} # Override defaults
+
 ## Form Helper Changes ##
 
 The changes this `FormBuilder` effects to the existing Rails form helpers is

@@ -95,7 +95,7 @@ class TwitterBootstrapFormFor::FormBuilder < ActionView::Helpers::FormBuilder
         template.concat self.label(attribute, label) if label
         template.concat template.content_tag(:div, :class => classes.join(' ')) {
           template.concat super(attribute, *(args << options))
-          template.concat error_span(attribute)
+          template.concat error_tag(attribute)
           block.call if block.present?
         }
       end
@@ -132,13 +132,25 @@ class TwitterBootstrapFormFor::FormBuilder < ActionView::Helpers::FormBuilder
     template.content_tag :div, options, &block
   end
 
-  def error_span(attribute, options = {})
-    options[:class] ||= 'help-inline'
+  def error_tag(attribute, options = {})
+    if self.errors_on?(attribute)
+      options = options.reverse_merge(error_html_options)
+      tag = options.delete(:tag)
+      template.content_tag(tag, self.errors_for(attribute), options)
+    end
+  end
 
-    template.content_tag(
-      :span, self.errors_for(attribute),
-      :class => options[:class]
-    ) if self.errors_on?(attribute)
+  def error_html_options
+    case self.options[:error_html]
+      when Hash
+        self.options[:error_html].reverse_merge(:tag => :span, :class => 'help-inline')
+      when :block, "block"
+        {:tag => :p, :class => "help-block"}
+      when :inline, "inline", nil
+        {:tag => :span, :class => "help-inline"}
+      else
+        raise ArgumentError.new("options[:error_html] must be :inline, :block, or a Hash")
+      end
   end
 
   def errors_on?(attribute)
